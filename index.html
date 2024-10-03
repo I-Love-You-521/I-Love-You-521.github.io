@@ -1,167 +1,152 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>我爱你-胡诗涵</title>  
-    <style>  
-        body {  
-            margin: 0;  
-            padding: 0;  
-            height: 100vh;  
-            display: flex;  
-            justify-content: center;  
-            align-items: center;  
-            background: linear-gradient(to bottom right, #ff9a9e, #fad0c4);  
-            font-family: 'Arial', sans-serif;  
-            overflow: hidden;  
-        }  
-  
-        #envelope {  
-            background-color: #fff;  
-            border: 2px solid #ff6b81;  
-            width: 150px;  
-            height: 100px;  
-            position: relative;  
-            cursor: pointer;  
-            display: flex;  
-            justify-content: center;  
-            align-items: center;  
-            transition: transform 0.5s ease, background-color 0.5s ease;  
-            border-radius: 10px;  
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  
-        }  
-  
-        #envelope::before, #envelope::after {  
-            content: '';  
-            position: absolute;  
-            width: 150px;  
-            height: 50px;  
-            background-color: #ff6b81;  
-            transform: rotate(45deg);  
-            border-radius: 5px;  
-        }  
-  
-        #envelope::before {  
-            top: -40px;  
-        }  
-  
-        #envelope::after {  
-            bottom: -40px;  
-        }  
-  
-        #envelope:hover {  
-            transform: scale(1.1);  
-            background-color: #ffe5e9;  
-        }  
-  
-        #message {  
-            display: none;  
-            text-align: center;  
-            font-size: 2.5rem;  
-            color: #ffffff;  
-            animation: fadeIn 2s forwards;  
-        }  
-  
-        @keyframes fadeIn {  
-            from { opacity: 0; }  
-            to { opacity: 1; }  
-        }  
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情侣空间</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #000, #1a1a1a);
+            overflow: hidden;
+            position: relative;
+        }
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            z-index: 0;
+            animation: twinkle 1.5s infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            flex-direction: column; /* 确保手机端布局 */
+        }
+        .profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px; /* 调整间距 */
+        }
+        img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 5px;
+            transition: transform 0.3s;
+        }
+        img:hover {
+            transform: scale(1.1);
+        }
+        .name {
+            color: #fff; /* 名字统一为白色字体 */
+            font-size: 18px; /* 可以根据需求调整大小 */
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 24px;
+            color: #fff; /* 统一为白色字体 */
+            z-index: 1;
+            animation: float 2s infinite alternate;
+            white-space: pre-line; /* 允许换行 */
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+        .firework {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: explode 1s forwards;
+        }
+        @keyframes explode {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 150px;
+                height: 150px;
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="profile-container">
+        <div class="profile">
+            <img src="https://i.ibb.co/jJLYdD2/20241003163116.jpg" alt="吴旺泽">
+            <div class="name">吴旺泽</div>
+        </div>
+        <div class="profile">
+            <img src="https://i.ibb.co/4gvD2hZ/20241003191307.jpg" alt="胡诗涵">
+            <div class="name">胡诗涵</div>
+        </div>
+    </div>
+    <div class="message" id="together-time"></div>
 
-        @media (max-width: 600px) {  
-            #message {  
-                font-size: 2rem;  
-            }  
-  
-            #envelope {  
-                width: 120px;  
-                height: 80px;  
-            }  
-        }  
+    <script>
+        function calculateTime() {
+            const startTime = new Date('2024-09-30T14:00:00');
+            const now = new Date();
+            const difference = Math.floor((now - startTime) / 1000);
 
-        #hearts {  
-            position: absolute;  
-            top: 0;  
-            left: 0;  
-            width: 100%;  
-            height: 100%;  
-            overflow: hidden;  
-            pointer-events: none;  
-        }  
-  
-        .heart {  
-            width: 20px;  
-            height: 20px;  
-            background-color: rgba(255, 107, 129, 0.8);  
-            position: absolute;  
-            bottom: -20px;  
-            animation: floatUp 5s infinite;  
-            transform: rotate(45deg);  
-        }  
-  
-        @keyframes floatUp {  
-            0% {  
-                transform: translateY(0) rotate(45deg);  
-                opacity: 1;  
-            }  
-            100% {  
-                transform: translateY(-100vh) rotate(45deg);  
-                opacity: 0;  
-            }  
-        }  
-    </style>  
-</head>  
-<body>  
-  
-<div id="envelope">💌</div>  
-<div id="message">  
-    <p>亲爱的胡诗涵，</p>  
-    <p>遇见你，是我一生中最美好的缘分。</p>  
-    <p>每一次看见你，世界都变得更明亮。</p>  
-    <p>我愿意陪你走过每一个四季，每一个晨昏。</p>  
-    <p>胡诗涵，我喜欢你，愿意和你携手，走过未来的每一个浪漫时光 💖</p>  
-</div>  
-  
-<div id="hearts"></div>  
-  
-<audio id="bg-music" preload="auto" style="display: none;">  
-    <source src="https://raw.githubusercontent.com/saikesw/toubaoAI/refs/heads/main/%E5%8B%87%E6%B0%94.mp3" type="audio/mpeg">  
-    Your browser does not support the audio element.  
-</audio>  
-  
-<script>  
-    const envelope = document.getElementById('envelope');  
-    const message = document.getElementById('message');  
-    const bgMusic = document.getElementById('bg-music');  
-    const heartsContainer = document.getElementById('hearts');  
-  
-    envelope.addEventListener('click', () => {  
-        envelope.style.display = 'none';  
-        message.style.display = 'block';  
-  
-          
-        if (bgMusic.readyState >= 2) {  
-            bgMusic.currentTime = 14;  
-            bgMusic.play().catch(error => console.log('播放失败:', error));  
-        } else {  
-            bgMusic.addEventListener('canplay', function() {  
-                bgMusic.currentTime = 14;  
-                bgMusic.play().catch(error => console.log('播放失败:', error));  
-            });  
-        }  
-  
-    
-        for (let i = 0; i < 50; i++) {  
-            const heart = document.createElement('div');  
-            heart.classList.add('heart');  
-            heart.style.left = `${Math.random() * 100}vw`;  
-            heart.style.animationDuration = `${Math.random() * 3 + 3}s`;  
-            heart.style.opacity = Math.random();  
-            heartsContainer.appendChild(heart);  
-        }  
-    });  
-</script>  
-  
-</body>  
+            const days = Math.floor(difference / 86400);
+            const hours = Math.floor((difference % 86400) / 3600);
+            const minutes = Math.floor((difference % 3600) / 60);
+            const seconds = difference % 60;
+
+            return `我们已经在一起了\n${days}天${hours}小时${minutes}分钟${seconds}秒`;
+        }
+
+        function updateTime() {
+            document.getElementById('together-time').textContent = calculateTime();
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        document.addEventListener('mousemove', (e) => {
+            createFirework(e.clientX, e.clientY);
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            createFirework(touch.clientX, touch.clientY);
+            e.preventDefault(); // 防止页面滚动
+        });
+
+        function createFirework(x, y) {
+            const firework = document.createElement('div');
+            firework.classList.add('firework');
+            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            firework.style.left = `${x}px`;
+            firework.style.top = `${y}px`;
+            document.body.appendChild(firework);
+
+            setTimeout(() => {
+                firework.remove();
+            }, 1000);
+        }
+
+        // 防止触屏设备移动网页内容
+        document.body.style.touchAction = 'none';
+    </script>
+</body>
 </html>
-
