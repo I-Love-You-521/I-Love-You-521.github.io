@@ -1,152 +1,293 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>情侣空间</title>
-    <style>
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #000, #1a1a1a);
-            overflow: hidden;
-            position: relative;
-        }
-        .stars {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            z-index: 0;
-            animation: twinkle 1.5s infinite alternate;
-        }
-        @keyframes twinkle {
-            0% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-        .profile-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
-            flex-direction: column; /* 确保手机端布局 */
-        }
-        .profile {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 10px; /* 调整间距 */
-        }
-        img {
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-            margin-bottom: 5px;
-            transition: transform 0.3s;
-        }
-        img:hover {
-            transform: scale(1.1);
-        }
-        .name {
-            color: #fff; /* 名字统一为白色字体 */
-            font-size: 18px; /* 可以根据需求调整大小 */
-        }
-        .message {
-            margin-top: 20px;
-            font-size: 24px;
-            color: #fff; /* 统一为白色字体 */
-            z-index: 1;
-            animation: float 2s infinite alternate;
-            white-space: pre-line; /* 允许换行 */
-        }
-        @keyframes float {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-10px); }
-        }
-        .firework {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: explode 1s forwards;
-        }
-        @keyframes explode {
-            0% {
-                width: 0;
-                height: 0;
-                opacity: 1;
-            }
-            100% {
-                width: 150px;
-                height: 150px;
-                opacity: 0;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>三界事业单位招考平台</title>
+  <!-- 引入 Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    /* 全局样式 */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f4f7f6;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+      padding: 20px;
+    }
+    /* 卡片式模块 */
+    .exam-type, #examPaper, #result {
+      background: #fff;
+      padding: 30px;
+      margin: 20px 0;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .exam-type h2, #examPaper h2, #result h2 {
+      margin-top: 0;
+    }
+    /* 按钮样式 */
+    button {
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px 0;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    /* 题目卡片 */
+    .question {
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #fafafa;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    .wrong {
+      border-left: 5px solid #ff4d4f;
+      background: #fff1f0;
+    }
+    label {
+      display: block;
+      margin: 5px 0;
+    }
+    #wrongAnswers .question {
+      margin: 10px 0;
+    }
+  </style>
 </head>
 <body>
-    <div class="stars"></div>
-    <div class="profile-container">
-        <div class="profile">
-            <img src="https://i.ibb.co" alt="吴旺泽">
-            <div class="name">吴旺泽</div>
-        </div>
-        <div class="profile">
-            <img src="https://i.i" alt="周雪云">
-            <div class="name">周雪云</div>
-        </div>
+  <div class="container">
+    <!-- 考试类型选择 -->
+    <div class="exam-type" id="examChoice">
+      <h2>请选择考试类型：</h2>
+      <button onclick="startExam('tian')">天庭事业编考试</button>
+      <button onclick="startExam('di')">地府事业编考试</button>
     </div>
-    <div class="message" id="together-time"></div>
 
-    <script>
-        function calculateTime() {
-            const startTime = new Date('2025-01-27T20:11:56');
-            const now = new Date();
-            const difference = Math.floor((now - startTime) / 1000);
+    <!-- 试卷部分 -->
+    <div id="examPaper" style="display:none;">
+      <h2 id="examTitle"></h2>
+      <div id="questionsContainer"></div>
+      <button onclick="submitExam()">提交试卷</button>
+    </div>
 
-            const days = Math.floor(difference / 86400);
-            const hours = Math.floor((difference % 86400) / 3600);
-            const minutes = Math.floor((difference % 3600) / 60);
-            const seconds = difference % 60;
+    <!-- 成绩展示 -->
+    <div id="result" style="display:none;">
+      <h2>考试成绩</h2>
+      <p>得分：<span id="score"></span></p>
+      <p>等级：<span id="grade"></span></p>
+      <div id="wrongAnswers"></div>
+      <button onclick="location.reload()">返回</button>
+    </div>
+  </div>
 
-            return `我们已经在一起了\n${days}天${hours}小时${minutes}分钟${seconds}秒`;
+  <script>
+    // 完整考试题库（均为正统道教知识，不含争议内容）
+    const examData = {
+      tian: [
+        // 天庭考试——30 道选择题
+        { type: 'choice', question: "在道教中，‘太上老君’指的是哪位圣人？", options: ["老子", "庄子", "孔子", "孟子"], answer: "A" },
+        { type: 'choice', question: "《道德经》的作者是？", options: ["老子", "庄子", "韩非子", "荀子"], answer: "A" },
+        { type: 'choice', question: "道教经典《南华经》主要记述的是？", options: ["庄子言行", "老子思想", "孔子礼仪", "孟子仁政"], answer: "A" },
+        { type: 'choice', question: "道教中，‘三清’指的是哪三位神祇？", options: ["元始天尊、灵宝天尊、道德天尊", "玉皇大帝、太上老君、元始天尊", "太上老君、真武大帝、李靖", "王灵官、哪吒、杨戬"], answer: "A" },
+        { type: 'choice', question: "道教修炼追求的主要境界是？", options: ["长生不老", "武功高强", "富贵荣华", "天下无敌"], answer: "A" },
+        { type: 'choice', question: "下列哪本著作不属于道教经典？", options: ["《道德经》", "《庄子》", "《论语》", "《抱朴子》"], answer: "C" },
+        { type: 'choice', question: "道教法事中常用的法器不包括下列哪项？", options: ["桃木剑", "符咒", "法铃", "铁扇"], answer: "D" },
+        { type: 'choice', question: "天庭体系中，哪位神仙被尊为武神？", options: ["真武大帝", "太上老君", "元始天尊", "灵宝天尊"], answer: "A" },
+        { type: 'choice', question: "道教中，负责调和阴阳的是哪一位神仙？", options: ["太乙救苦天尊", "关圣帝君", "文昌帝君", "哪吒"], answer: "A" },
+        { type: 'choice', question: "道教认为人修炼后可成仙，其过程称为？", options: ["炼丹", "御剑", "飞升", "脱胎换骨"], answer: "C" },
+        { type: 'choice', question: "在道教中，哪部经典阐述了‘无为而治’的理念？", options: ["《道德经》", "《庄子》", "《黄帝内经》", "《周易》"], answer: "A" },
+        { type: 'choice', question: "道教思想对中国文化影响深远，其起源主要可以追溯到哪个时期？", options: ["先秦时期", "汉朝", "唐朝", "宋朝"], answer: "A" },
+        { type: 'choice', question: "道教中，常见的符咒主要用于？", options: ["驱邪避灾", "招财进宝", "学习文史", "预测天气"], answer: "A" },
+        { type: 'choice', question: "道教信仰中讲求‘天人合一’，其中‘天’通常指的是？", options: ["自然宇宙", "上帝", "皇帝", "英雄"], answer: "A" },
+        { type: 'choice', question: "在道教礼仪中，‘祭天’通常在何时进行？", options: ["冬至", "夏至", "春节", "中秋"], answer: "A" },
+        { type: 'choice', question: "道教的主要流派之一‘全真道’强调修身养性，其创始人是？", options: ["王重阳", "张道陵", "葛洪", "吕洞宾"], answer: "A" },
+        { type: 'choice', question: "‘龙虎山’在道教中以修仙著称，它位于哪个省份？", options: ["江西", "浙江", "福建", "安徽"], answer: "A" },
+        { type: 'choice', question: "道教认为自然界中的阴阳二气平衡是世界运行的基础，下列哪项最能体现这一观点？", options: ["阴阳五行", "天圆地方", "天人感应", "上天入地"], answer: "A" },
+        { type: 'choice', question: "在道教经典中，哪部著作主要论述治国安民的理念？", options: ["《太平经》", "《道德经》", "《庄子》", "《抱朴子》"], answer: "A" },
+        { type: 'choice', question: "道教神仙传说中，哪位神仙以放荡不羁著称，被誉为‘八仙’之一？", options: ["吕洞宾", "李铁拐", "张果老", "何仙姑"], answer: "A" },
+        { type: 'choice', question: "道教重视内丹修炼，下列哪种练习方式属于内丹术？", options: ["静坐冥思", "外出奔走", "苦行僧行", "武术修炼"], answer: "A" },
+        { type: 'choice', question: "道教中认为‘虚无’是一种根本存在，下列哪句描述与此思想相符？", options: ["道生一，一生二，二生三，三生万物", "有则有，无则无", "君子以文会友", "以德治国"], answer: "A" },
+        { type: 'choice', question: "在道教文化中，‘斋醮’仪式主要是为了？", options: ["祭祀神灵", "文艺表演", "军事训练", "商业交易"], answer: "A" },
+        { type: 'choice', question: "在道教仪式中，常见的舞蹈表演称为？", options: ["舞狮", "舞龙", "道教神仙舞", "秧歌"], answer: "C" },
+        { type: 'choice', question: "道教中的“五行”学说包括下列哪五种元素？", options: ["金、木、水、火、土", "天、地、风、火、水", "金、木、水、火、风", "日、月、星、云、雨"], answer: "A" },
+        { type: 'choice', question: "在道教建筑中，常见的飞檐翘角体现的是哪种美学？", options: ["曲线美", "对称美", "简洁美", "粗犷美"], answer: "A" },
+        { type: 'choice', question: "道教中‘金丹’指的是？", options: ["内炼成就", "炼制的丹药", "祭祀用品", "道家经典"], answer: "A" },
+        { type: 'choice', question: "道教注重修身养性，下列哪项活动被认为是道家修炼的重要方式？", options: ["打坐冥想", "竞赛运动", "商业谈判", "烹饪美食"], answer: "A" },
+        { type: 'choice', question: "在道教宇宙观中，‘无极’通常指的是？", options: ["原始混沌", "无限空间", "时间起点", "神的存在"], answer: "A" },
+        { type: 'choice', question: "道教中常提倡的‘清静无为’思想强调的是？", options: ["顺应自然", "积极进取", "权谋计策", "刻苦勤劳"], answer: "A" },
+        // 天庭考试——20 道判断题（对/错，A 表示“对”，B 表示“错”）
+        { type: 'judge', question: "《道德经》主张‘无为而治’。", answer: "A" },
+        { type: 'judge', question: "道教认为天地间万物皆有灵。", answer: "A" },
+        { type: 'judge', question: "道教完全排斥世俗生活，提倡隐居不问世事。", answer: "B" },
+        { type: 'judge', question: "在道教中，‘三清’是指三位最高神灵。", answer: "A" },
+        { type: 'judge', question: "道教经典《庄子》是儒家经典之一。", answer: "B" },
+        { type: 'judge', question: "全真道和正一道是道教的两个主要流派。", answer: "A" },
+        { type: 'judge', question: "道教修炼注重内丹与外丹并重。", answer: "A" },
+        { type: 'judge', question: "道教认为‘阴阳’是世界存在的两种对立而统一的力量。", answer: "A" },
+        { type: 'judge', question: "道教礼仪中不包括祭祀祖先。", answer: "B" },
+        { type: 'judge', question: "道教主张人应与自然和谐共处。", answer: "A" },
+        { type: 'judge', question: "道教中的符咒主要用于医疗救人。", answer: "B" },
+        { type: 'judge', question: "《南华经》是记录庄子言行的著作。", answer: "A" },
+        { type: 'judge', question: "道教的修炼方法仅限于打坐冥想。", answer: "B" },
+        { type: 'judge', question: "道教中的‘斋醮’是为了祈求国泰民安。", answer: "A" },
+        { type: 'judge', question: "道教认为‘无极’后即生太极。", answer: "A" },
+        { type: 'judge', question: "道教中不重视礼仪仪式。", answer: "B" },
+        { type: 'judge', question: "道教中的‘内丹术’主要追求长生不老。", answer: "A" },
+        { type: 'judge', question: "道教经典中提到的‘道’是一个具体的神灵。", answer: "B" },
+        { type: 'judge', question: "道教的五行学说与自然界的变化密切相关。", answer: "A" },
+        { type: 'judge', question: "道教认为世间万物皆有定数，不可改变。", answer: "B" }
+      ],
+      di: [
+        // 地府考试——30 道选择题
+        { type: 'choice', question: "在道教体系中，管理阴间的是下列哪位神祇？", options: ["阎罗王", "关圣帝君", "真武大帝", "文昌帝君"], answer: "A" },
+        { type: 'choice', question: "道教认为阴间审判案件的主要机关是？", options: ["十殿", "八卦", "五行", "三清"], answer: "A" },
+        { type: 'choice', question: "十殿阎王中，负责审判生前罪行的是？", options: ["第一殿", "第三殿", "第七殿", "第十殿"], answer: "A" },
+        { type: 'choice', question: "道教中用于度化亡魂的仪式称为？", options: ["超度", "祭天", "斋醮", "礼佛"], answer: "A" },
+        { type: 'choice', question: "在道教信仰中，冥器主要用于？", options: ["安葬死者", "庆祝节日", "治病救人", "驱邪避灾"], answer: "A" },
+        { type: 'choice', question: "道教认为，亡魂经过审判后可以获得再生的机会，此过程称为？", options: ["轮回", "飞升", "涅槃", "转世"], answer: "A" },
+        { type: 'choice', question: "道教中负责记录亡魂罪过的文书是？", options: ["生死簿", "命运书", "天书", "阴司录"], answer: "A" },
+        { type: 'choice', question: "在道教神话中，哪位神仙被视为判官之首？", options: ["文昌帝君", "判官大帝", "阎罗王", "太上老君"], answer: "C" },
+        { type: 'choice', question: "地府中用来惩罚恶魂的刑罚不包括下列哪项？", options: ["鞭笞", "火烧", "冰冻", "飞升"], answer: "D" },
+        { type: 'choice', question: "道教中讲究‘因果报应’，主要体现在哪个环节？", options: ["阴间审判", "修炼内丹", "祭祀仪式", "符咒法术"], answer: "A" },
+        { type: 'choice', question: "下列关于地府的描述，哪项是符合正统道教观点的？", options: ["阴间有十殿阎王负责审判", "地府中人人都有转世机会", "死后不再有任何审判", "地府是乐园"], answer: "A" },
+        { type: 'choice', question: "道教认为，亡魂在阴间的遭遇与生前的行为密切相关，此观点称为？", options: ["天人感应", "因果报应", "阴阳调和", "无为而治"], answer: "B" },
+        { type: 'choice', question: "道教仪式中常见的‘阴司大典’主要是为了？", options: ["超度亡魂", "祭祀祖先", "祈求丰收", "迎接新年"], answer: "A" },
+        { type: 'choice', question: "地府中的‘奈何桥’传说寓意着？", options: ["生死离别", "幸福婚姻", "文武双全", "富贵荣华"], answer: "A" },
+        { type: 'choice', question: "道教经典中关于阴间的记载主要见于？", options: ["《阴符经》", "《道德经》", "《抱朴子》", "《太平经》"], answer: "A" },
+        { type: 'choice', question: "下列哪种仪式在道教地府信仰中较为常见？", options: ["还愿仪式", "祭孔大典", "武术表演", "文艺演出"], answer: "A" },
+        { type: 'choice', question: "在道教阴间体系中，哪项概念用于记录亡魂生前业报？", options: ["生死簿", "天书", "阴历", "命盘"], answer: "A" },
+        { type: 'choice', question: "道教地府信仰中，冥器和纸钱的使用主要是为了？", options: ["送行亡魂", "祈求长寿", "迎接财神", "庆祝节日"], answer: "A" },
+        { type: 'choice', question: "地府审判中的刑罚讲究公正，此理念体现了道教的？", options: ["道德经义", "因果律", "五行相生", "阴阳平衡"], answer: "B" },
+        { type: 'choice', question: "关于道教地府的理论，下列哪项说法是不正确的？", options: ["阴间与阳间互相独立", "亡魂在阴间接受审判", "生死簿记录生前业报", "十殿阎王管理阴间"], answer: "A" },
+        { type: 'choice', question: "道教地府体系中，‘还愿’仪式的目的是？", options: ["消除亡魂冤屈", "报答神灵恩德", "安抚亡魂、促其转世", "祈求丰收"], answer: "C" },
+        { type: 'choice', question: "下列关于‘奈何桥’的描述，哪项最符合正统道教说法？", options: ["亡魂过桥后可直接升天", "奈何桥为亡魂转世前的考验", "奈何桥象征生死离别", "奈何桥是阴间的乐园"], answer: "C" },
+        { type: 'choice', question: "在道教地府信仰中，哪种物品常用于祭祀仪式以供养阴间神灵？", options: ["冥器", "宝剑", "香炉", "石碑"], answer: "A" },
+        { type: 'choice', question: "道教认为，阴间的审判过程体现了哪一基本法则？", options: ["因果报应", "人定胜天", "无为而治", "天人分离"], answer: "A" },
+        { type: 'choice', question: "在道教仪式中，纸钱的焚烧主要象征着？", options: ["财富的流通", "送达阴间", "祈求吉祥", "驱邪避灾"], answer: "B" },
+        { type: 'choice', question: "道教地府信仰中，以下哪项不是地府审判的组成部分？", options: ["生死簿", "阴司录", "天书", "冥器"], answer: "D" },
+        { type: 'choice', question: "道教地府中常见的刑罚形式包括下列哪项？", options: ["鞭笞", "游泳", "诗歌朗诵", "文书抄写"], answer: "A" },
+        { type: 'choice', question: "在道教信仰中，亡魂若得超度，可免受刑罚，此过程称为？", options: ["解冤", "超生", "超度", "转化"], answer: "C" },
+        { type: 'choice', question: "道教认为，阴间世界的存在是为了体现哪种宇宙法则？", options: ["因果律", "自由意志", "虚无主义", "机械论"], answer: "A" },
+        { type: 'choice', question: "在道教地府体系中，‘判官’的主要职责是？", options: ["记录亡魂业报", "管理人间财运", "主持婚丧仪式", "指导修炼内丹"], answer: "A" },
+        // 地府考试——20 道判断题（对/错）
+        { type: 'judge', question: "道教地府信仰中，阴间审判体现了严格的因果报应原则。", answer: "A" },
+        { type: 'judge', question: "在正统道教中，十殿阎王制度被认为是虚构的，不具有实际信仰意义。", answer: "B" },
+        { type: 'judge', question: "道教地府的生死簿记录了每个人生前的行为。", answer: "A" },
+        { type: 'judge', question: "道教仪式中使用冥器和纸钱只是一种迷信行为，与教义无关。", answer: "B" },
+        { type: 'judge', question: "阴间审判与阳间生活有密切的因果联系。", answer: "A" },
+        { type: 'judge', question: "在道教信仰中，亡魂经过超度仪式后可以改变其转世命运。", answer: "A" },
+        { type: 'judge', question: "奈何桥在道教地府中被视为通向新生的必经之路。", answer: "B" },
+        { type: 'judge', question: "道教地府的判官只记录善恶，不进行实际审判。", answer: "B" },
+        { type: 'judge', question: "阴司大典是道教中超度亡魂的重要仪式。", answer: "A" },
+        { type: 'judge', question: "道教认为，阴间的审判和刑罚体现了公正无私的宇宙法则。", answer: "A" },
+        { type: 'judge', question: "在道教信仰中，纸钱焚烧被认为能将财物送达阴间供神灵享用。", answer: "A" },
+        { type: 'judge', question: "道教地府体系中，亡魂的命运与生前善恶完全无关。", answer: "B" },
+        { type: 'judge', question: "十殿阎王中，每位阎王都有固定的审判职责。", answer: "A" },
+        { type: 'judge', question: "道教中认为，阴间世界与阳间世界完全割裂，没有互动。", answer: "B" },
+        { type: 'judge', question: "道教地府的刑罚形式多样，体现了因果报应的严肃性。", answer: "A" },
+        { type: 'judge', question: "超度仪式仅限于亡魂，对于生者没有任何影响。", answer: "B" },
+        { type: 'judge', question: "道教信仰中，亡魂在阴间可以通过仪式获得转世的机会。", answer: "A" },
+        { type: 'judge', question: "在道教教义中，生死簿的存在证明了天地间的道德秩序。", answer: "A" },
+        { type: 'judge', question: "阴间审判过程不涉及神灵的干预，而是完全依靠亡魂自我反省。", answer: "B" },
+        { type: 'judge', question: "道教地府信仰强调阴阳平衡，认为阴间和阳间相辅相成。", answer: "A" }
+      ]
+    };
+
+    let currentExam = [];
+    let examType = '';
+
+    // 开始考试：选择考试类型后隐藏选择区，显示试卷
+    function startExam(type) {
+      examType = type;
+      document.getElementById('examChoice').style.display = 'none';
+      document.getElementById('examPaper').style.display = 'block';
+      document.getElementById('examTitle').textContent = type === 'tian' ? "天庭事业编考试" : "地府事业编考试";
+      currentExam = examData[type];
+      renderQuestions();
+    }
+
+    // 渲染试卷——遍历题库，生成每题的 HTML
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+      currentExam.forEach((q, index) => {
+        const div = document.createElement('div');
+        div.className = 'question';
+        if (q.type === 'choice') {
+          div.innerHTML = `
+            <p>${index + 1}. ${q.question}</p>
+            ${q.options.map((opt, i) => `
+              <label>
+                <input type="radio" name="q${index}" value="${String.fromCharCode(65 + i)}">
+                ${String.fromCharCode(65 + i)}. ${opt}
+              </label>
+            `).join('')}
+          `;
+        } else {
+          div.innerHTML = `
+            <p>${index + 1}. ${q.question}</p>
+            <label><input type="radio" name="q${index}" value="A"> 对</label>
+            <label><input type="radio" name="q${index}" value="B"> 错</label>
+          `;
         }
+        container.appendChild(div);
+      });
+    }
 
-        function updateTime() {
-            document.getElementById('together-time').textContent = calculateTime();
+    // 提交试卷，遍历每题判断答案，计算得分并收集错误题目
+    function submitExam() {
+      let score = 0;
+      const wrongAnswers = [];
+      currentExam.forEach((q, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        const userAnswer = selected ? selected.value : '';
+        if (userAnswer === q.answer) {
+          score += 2; // 每题 2 分
+        } else {
+          wrongAnswers.push({
+            question: q.question,
+            userAnswer: userAnswer || "未作答",
+            correctAnswer: q.answer
+          });
         }
+      });
+      showResult(score, wrongAnswers);
+    }
 
-        updateTime();
-        setInterval(updateTime, 1000);
-
-        document.addEventListener('mousemove', (e) => {
-            createFirework(e.clientX, e.clientY);
-        });
-
-        document.addEventListener('touchmove', (e) => {
-            const touch = e.touches[0];
-            createFirework(touch.clientX, touch.clientY);
-            e.preventDefault(); // 防止页面滚动
-        });
-
-        function createFirework(x, y) {
-            const firework = document.createElement('div');
-            firework.classList.add('firework');
-            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-            firework.style.left = `${x}px`;
-            firework.style.top = `${y}px`;
-            document.body.appendChild(firework);
-
-            setTimeout(() => {
-                firework.remove();
-            }, 1000);
-        }
-
-        // 防止触屏设备移动网页内容
-        document.body.style.touchAction = 'none';
-    </script>
+    // 显示成绩和错题解析
+    function showResult(score, wrongAnswers) {
+      document.getElementById('examPaper').style.display = 'none';
+      const resultDiv = document.getElementById('result');
+      resultDiv.style.display = 'block';
+      document.getElementById('score').textContent = score;
+      document.getElementById('grade').textContent = score >= 80 ? '考核通过 ✅' : '考核未通过 ❌';
+      const wrongContainer = document.getElementById('wrongAnswers');
+      wrongContainer.innerHTML = '<h3>错题解析：</h3>';
+      wrongAnswers.forEach(wrong => {
+        const div = document.createElement('div');
+        div.className = 'question wrong';
+        div.innerHTML = `
+          <p>${wrong.question}</p>
+          <p>你的答案：${wrong.userAnswer}</p>
+          <p>正确答案：${wrong.correctAnswer}</p>
+        `;
+        wrongContainer.appendChild(div);
+      });
+    }
+  </script>
 </body>
 </html>
